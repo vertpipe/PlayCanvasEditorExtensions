@@ -1,0 +1,2 @@
+# PlayCanvasEditorExtensions
+PlayCanvasEditorExtensions
