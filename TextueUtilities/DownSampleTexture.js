@@ -127,6 +127,7 @@
             newImageName = newImageName + "_" + sizeStr;
         }
 
+        // Load the image using opencv.js and process it
         async function process() {
 
             const file = await loadAndScaleImageToBlob(imageUrl, scale, format);
@@ -155,7 +156,7 @@
         // var lowerMipLevels = findMinimalMips(selectedAssets) - 1; // exclude Mip 0
 
         // construct items
-        var menuItems = new Array(5);
+        var menuItems = [];
         for (let k = 1; k <= 5; k++) {
 
             var menuItem = new pcui.MenuItem({
