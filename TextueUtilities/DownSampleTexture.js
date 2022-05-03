@@ -145,7 +145,7 @@
             });
 
             // replace the asset with new texture
-            if(newAsset){
+            if (newAsset) {
                 selectedAsset.apiAsset.replace(newAsset);
             }
         }
