@@ -64,7 +64,7 @@
             Math.max(1, Math.floor(src.cols * scale)),
             Math.max(1, Math.floor(src.rows * scale))
         );
-        console.log(dsize);
+
         // opencv interplation flags: https://docs.opencv.org/3.4/da/d54/group__imgproc__transform.html
         const CV_INTERPOLATION_FLAG = cv.INTER_AREA; // change the interpolation flage here
         cv.resize(src, dst, dsize, 0, 0, CV_INTERPOLATION_FLAG);
@@ -99,6 +99,9 @@
     }
 
     async function downsampleAndUpload(selectedAsset, scale) {
+
+        if (selectedAsset._data.type !== "texture") return;
+
         var imageUrl = selectedAsset.get('file.url');
         var imageName = selectedAsset.get('name');
         var format = selectedAsset.get("meta.format");
@@ -168,12 +171,25 @@
                 text: "1/" + (2 ** k),
                 icon: null,
                 dividor: 2 ** k,
-                onSelect: (item, currentAsset) => {
-                    var selectedAssets = assetPanel._selectedAssets;
-                    for (let i = 0; i < selectedAssets.length; i++) {
-                        // do the process one by one?
-                        downsampleAndUpload(selectedAssets[i], 1.0 / 2 ** k);
+                onSelect: (currentAsset) => {
+                    let currentHandled = false;
+                    let selectedAssets = assetPanel._selectedAssets;
+                    if (selectedAssets.length > 0) {
+                        for (let i = 0; i < selectedAssets.length; i++) {
+                            // do the process one by one?
+                            downsampleAndUpload(selectedAssets[i], 1.0 / 2 ** k);
+                            // mark if we need to further handle the current asset
+                            if (currentAsset === selectedAssets[i]) {
+                                currentHandled = true;
+                            }
+                        }
                     }
+
+                    // current asset handle
+                    if (!currentHandled) {
+                        downsampleAndUpload(currentAsset, 1.0 / 2 ** k);
+                    }
+
                 }
             });
             menuItems.push(menuItem);
@@ -183,11 +199,13 @@
             text: 'Down Sample Texture',
             icon: 'E288',
             items: menuItems,
-            onIsVisible: (item, currentAsset) => {
+            onIsVisible: (currentAsset) => {
+
+                if (currentAsset && currentAsset._data.type == "texture") return true;
 
                 var selectedAssets = assetPanel._selectedAssets;
                 var numAssets = selectedAssets.length;
-                var bVisible = selectedAssets.length >= 1;
+                var bVisible = selectedAssets.length >= 1
                 for (let i = 0; i < numAssets; i++) {
                     if (selectedAssets[i]._data.type !== "texture") {
                         bVisible = false;
