@@ -136,13 +136,18 @@
 
             const currentFolder = editor.call('assets:panel:currentFolder');
 
-            editor.assets.upload({
+            var newAsset = await editor.assets.upload({
                 name: newImageName,
                 file: file,
                 type: 'texture',
                 folder: currentFolder,
                 preload: true
             });
+
+            // replace the asset with new texture
+            if(newAsset){
+                selectedAsset.apiAsset.replace(newAsset);
+            }
         }
 
         process();
